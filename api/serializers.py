@@ -28,3 +28,17 @@ class PostSerializer(serializers.ModelSerializer):
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
+    
+class ProfileSerializer(serializers.ModelSerializer):
+    # ADICIONE ESTA LINHA
+    following = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        # E ADICIONE 'following' À LISTA DE CAMPOS
+        fields = ['id', 'username', 'email', 'bio', 'profile_picture', 'following']
+
+    # E ADICIONE ESTE MÉTODO
+    def get_following(self, obj):
+        # Retorna uma lista de IDs de usuários que o 'obj' (usuário do perfil) segue.
+        return [follow.followed.id for follow in obj.following.all()]

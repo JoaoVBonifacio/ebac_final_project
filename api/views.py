@@ -79,6 +79,19 @@ class FollowView(APIView):
             return Response({"status": "seguindo"}, status=status.HTTP_201_CREATED)
         except User.DoesNotExist:
             return Response({"error": "Usuário não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+    
+    def delete(self, request, pk):
+        try:
+            user_to_unfollow = User.objects.get(pk=pk)
+            # Encontra a relação de "seguir"
+            relation = Follow.objects.filter(follower=request.user, followed=user_to_unfollow)
+            if relation.exists():
+                relation.delete()
+                return Response({"status": "deixou de seguir"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": "Você não está seguindo este usuário."}, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response({"error": "Usuário não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
 class UserListView(generics.ListAPIView):
     queryset = User.objects.all()

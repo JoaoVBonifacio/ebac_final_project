@@ -99,11 +99,10 @@ async function handleFeedPage() {
         return;
     }
 
-    const feedContainer = document.getElementById('feed-container');
-    const newPostForm = document.getElementById('new-post-form');
-    const logoutButton = document.getElementById('logout-button');
+    // Variável para guardar a lista de quem o usuário logado segue
+    let currentUserFollowingIds = [];
 
-    // --- CARREGAR DADOS DO USUÁRIO LOGADO ---
+    // --- CARREGAR DADOS DO USUÁRIO LOGADO (ATUALIZADA) ---
     async function loadCurrentUserData() {
         try {
             const response = await fetch(`${API_URL}/profile/`, {
@@ -112,15 +111,16 @@ async function handleFeedPage() {
             if (!response.ok) throw new Error('Não foi possível carregar dados do usuário.');
             
             const user = await response.json();
+            
+            // GUARDA A INFORMAÇÃO MAIS IMPORTANTE
+            currentUserFollowingIds = user.following || [];
+
             const defaultAvatar = 'static/icone.png';
             const userAvatarUrl = user.profile_picture ? `${BASE_URL}${user.profile_picture}` : defaultAvatar;
 
-            // Atualiza a barra lateral
             document.getElementById('user-avatar-sidebar').src = userAvatarUrl;
             document.getElementById('user-name-sidebar').textContent = user.username;
             document.getElementById('user-username-sidebar').textContent = `@${user.username}`;
-            
-            // Atualiza a imagem no formulário de post
             document.getElementById('user-avatar-post-form').src = userAvatarUrl;
 
         } catch (error) {
@@ -128,10 +128,11 @@ async function handleFeedPage() {
         }
     }
 
-
-    // --- FUNÇÃO PARA CARREGAR O FEED ---
+    // --- FUNÇÃO PARA CARREGAR O FEED (sem alterações) ---
     async function loadFeed() {
+        const feedContainer = document.getElementById('feed-container');
         try {
+            // ... (o código dentro desta função continua exatamente o mesmo)
             const response = await fetch(`${API_URL}/feed/`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -149,63 +150,127 @@ async function handleFeedPage() {
             }
 
             posts.forEach(post => {
-    const postElement = document.createElement('article');
-    postElement.className = 'post glass-container'; // Adiciona a classe de vidro
-    
-    const authorAvatar = post.author.profile_picture ? `${BASE_URL}${post.author.profile_picture}` : 'static/icone.png';
-    const postDate = new Date(post.created_at).toLocaleDateString('pt-BR', { hour: '2-digit', minute: '2-digit'});
+                const postElement = document.createElement('article');
+                postElement.className = 'post glass-container';
+                const authorAvatar = post.author.profile_picture ? `${BASE_URL}${post.author.profile_picture}` : 'static/icone.png';
+                const postDate = new Date(post.created_at).toLocaleDateString('pt-BR', { hour: '2-digit', minute: '2-digit'});
 
-    postElement.innerHTML = `
-        <img src="${authorAvatar}" alt="Avatar de ${post.author.username}" class="post-avatar">
-        <div class="post-body">
-            <div class="post-header">
-                <strong>${post.author.username}</strong>
-                <span>@${post.author.username} • ${postDate}</span>
-            </div>
-            <p class="post-content">${post.content}</p>
-            <div class="post-footer">
-                <div class="action"><span class="material-symbols-outlined">chat_bubble_outline</span> 0</div>
-                <div class="action"><span class="material-symbols-outlined">repeat</span> 0</div>
-                <div class="action"><span class="material-symbols-outlined">favorite_border</span> 0</div>
-                <div class="action"><span class="material-symbols-outlined">ios_share</span></div>
-            </div>
-        </div>
-    `;
-    feedContainer.appendChild(postElement);
-});
+                postElement.innerHTML = `
+                    <img src="${authorAvatar}" alt="Avatar de ${post.author.username}" class="post-avatar">
+                    <div class="post-body">
+                        <div class="post-header">
+                            <strong>${post.author.username}</strong>
+                            <span>@${post.author.username} • ${postDate}</span>
+                        </div>
+                        <p class="post-content">${post.content}</p>
+                        <div class="post-footer">
+                            <div class="action"><span class="material-symbols-outlined">chat_bubble_outline</span> 0</div>
+                            <div class="action"><span class="material-symbols-outlined">repeat</span> 0</div>
+                            <div class="action"><span class="material-symbols-outlined">favorite_border</span> 0</div>
+                            <div class="action"><span class="material-symbols-outlined">ios_share</span></div>
+                        </div>
+                    </div>
+                `;
+                feedContainer.appendChild(postElement);
+            });
         } catch (error) {
             feedContainer.innerHTML = `<p style="padding: 15px;">${error.message}</p>`;
         }
     }
 
-    // Evento para criar um novo post
-    newPostForm.addEventListener('submit', async (e) => {
+    // --- FUNÇÃO PARA CARREGAR USUÁRIOS (ATUALIZADA) ---
+    async function loadUsers() {
+        const usersContainer = document.querySelector('.who-to-follow-box ul');
+        if (!usersContainer) return;
+
+        try {
+            const usersResponse = await fetch(`${API_URL}/users/`, { headers: { 'Authorization': `Bearer ${token}` }});
+            const users = await usersResponse.json();
+
+            usersContainer.innerHTML = '';
+            users.forEach(user => {
+                // AGORA USAMOS A VARIÁVEL CONFIÁVEL
+                const isFollowing = currentUserFollowingIds.includes(user.id);
+                
+                const userAvatar = user.profile_picture ? `${BASE_URL}${user.profile_picture}` : 'static/icone.png';
+                const userElement = document.createElement('li');
+                userElement.innerHTML = `
+                    <img src="${userAvatar}" alt="Avatar de ${user.username}">
+                    <div class="user-info">
+                        <strong>${user.username}</strong>
+                        <span>@${user.username}</span>
+                    </div>
+                    <button class="follow-button" data-user-id="${user.id}" data-following="${isFollowing}">
+                        ${isFollowing ? 'Seguindo' : 'Seguir'}
+                    </button>
+                `;
+                usersContainer.appendChild(userElement);
+            });
+        } catch (error) {
+            console.error('Erro ao carregar usuários:', error);
+        }
+    }
+
+    // --- EVENT LISTENER PARA SEGUIR/DEIXAR DE SEGUIR (ATUALIZADO) ---
+    document.querySelector('.right-sidebar').addEventListener('click', async (e) => {
+        if (e.target && e.target.classList.contains('follow-button')) {
+            const button = e.target;
+            const userId = parseInt(button.dataset.userId); // Converte para número
+            const isFollowing = button.dataset.following === 'true';
+
+            const method = isFollowing ? 'DELETE' : 'POST';
+
+            try {
+                const response = await fetch(`${API_URL}/users/${userId}/follow/`, {
+                    method: method,
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    // ATUALIZA NOSSA "FONTE DA VERDADE" LOCALMENTE
+                    if (isFollowing) {
+                        // Remove o ID da lista
+                        currentUserFollowingIds = currentUserFollowingIds.filter(id => id !== userId);
+                    } else {
+                        // Adiciona o ID na lista
+                        currentUserFollowingIds.push(userId);
+                    }
+                    
+                    // ATUALIZA O BOTÃO
+                    button.dataset.following = !isFollowing;
+                    button.textContent = !isFollowing ? 'Seguindo' : 'Seguir';
+                    
+                    // RECARREGA APENAS O FEED
+                    loadFeed();
+                }
+            } catch (error) {
+                console.error('Erro ao seguir/deixar de seguir:', error);
+            }
+        }
+    });
+
+    // --- EVENT LISTENERS DE POST E LOGOUT (sem alterações) ---
+    document.getElementById('new-post-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const content = document.getElementById('post-content').value;
-        if (!content.trim()) return; // Não posta se estiver vazio
-
+        if (!content.trim()) return;
         await fetch(`${API_URL}/posts/create/`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
+            headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
             body: JSON.stringify({ content })
         });
         document.getElementById('post-content').value = '';
         loadFeed();
     });
-    
-    // Evento de Logout
-    logoutButton.addEventListener('click', () => {
+    document.getElementById('logout-button').addEventListener('click', () => {
         sessionStorage.removeItem('accessToken');
         window.location.href = 'index.html';
     });
 
-
-    // Carrega tudo ao iniciar a página
-    loadCurrentUserData();
-    loadFeed();
+    // --- CARREGA TUDO EM ORDEM ---
+    await loadCurrentUserData(); // Espera carregar os dados do usuário primeiro
+    loadFeed();                  // Carrega o feed
+    loadUsers();                 // Carrega a lista de "Quem Seguir"
 }
 
 // Função para cuidar da página de perfil (sem alterações)
