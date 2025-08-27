@@ -5,7 +5,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = "django-insecure-g6t0qk=u3k*dfm9%iuncj(zx7#dt89y@=vl58txu72fy!$j1&3"
-DEBUG = True
+DEBUG = False
 
 # Deixe o ALLOWED_HOSTS aberto por enquanto para o deploy
 ALLOWED_HOSTS = ["joaovbonifacio.pythonanywhere.com"]
