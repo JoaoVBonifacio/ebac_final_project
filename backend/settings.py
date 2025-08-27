@@ -70,7 +70,7 @@ REST_FRAMEWORK = {
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5500",
     "http://localhost:5500",
-    "https://ebac-final-project.vercel.app/",
+    "https://ebac-final-project.vercel.app",
 ]
 
 CORS_ALLOW_HEADERS = [

@@ -2,11 +2,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-# DEIXE SUA CLASSE User ASSIM:
+# DEIXE SUA CLASSE User EXATAMENTE ASSIM:
 class User(AbstractUser):
-    # A classe AbstractUser já cuida de todos os campos padrão
-    # (username, password, groups, permissions, etc).
-    # Nós só adicionamos os nossos campos extras.
+    # A classe AbstractUser já cuida de todos os campos padrão.
+    # Nós só precisamos adicionar os nossos campos extras.
     bio = models.TextField(blank=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
 
