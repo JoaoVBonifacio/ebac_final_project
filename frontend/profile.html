@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Perfil</title>
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+    <header>
+        <h1>Editar Perfil</h1>
+        <a href="feed.html">Voltar para o Feed</a>
+    </header>
+
+    <main>
+        <form id="profile-form">
+            <h2>Seus Dados</h2>
+            <img id="profile-pic-preview" src="" alt="Foto de Perfil" width="100">
+            
+            <label for="profile_picture">Mudar foto de perfil:</label>
+            <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
+
+            <label for="username">Nome de usuário:</label>
+            <input type="text" id="username" name="username" required>
+            
+            <label for="bio">Bio:</label>
+            <textarea id="bio" name="bio"></textarea>
+
+            <button type="submit">Salvar Alterações</button>
+            <p id="profile-success" class="success-message"></p>
+        </form>
+
+        <hr>
+
+        <form id="password-form">
+            <h2>Alterar Senha</h2>
+            <label for="old_password">Senha Antiga:</label>
+            <input type="password" id="old_password" required>
+            
+            <label for="new_password">Nova Senha:</label>
+            <input type="password" id="new_password" required>
+
+            <button type="submit">Alterar Senha</button>
+            <p id="password-error" class="error-message"></p>
+            <p id="password-success" class="success-message"></p>
+        </form>
+    </main>
+
+    <script src="static/app.js"></script>
+</body>
+</html>

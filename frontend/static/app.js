@@ -12,23 +12,33 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('feed-container')) {
         handleFeedPage();
     }
+
+    // --- LÓGICA DA PÁGINA DE PERFIL ---
+     if (document.getElementById('profile-form')) {
+        handleProfilePage();
+    }
 });
 
 // Função para cuidar da página de autenticação
 function handleAuthPage() {
+    const loginContainer = document.getElementById('login-container');
+    const registerContainer = document.getElementById('register-container');
+
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
     const showRegisterLink = document.getElementById('show-register');
     const showLoginLink = document.getElementById('show-login');
 
     // Alternar entre formulários de login e registro
-    showRegisterLink.addEventListener('click', () => {
-        loginForm.style.display = 'none';
-        registerForm.style.display = 'block';
+     showRegisterLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginContainer.style.display = 'none';
+        registerContainer.style.display = 'block';
     });
-    showLoginLink.addEventListener('click', () => {
-        registerForm.style.display = 'none';
-        loginForm.style.display = 'block';
+    showLoginLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        registerContainer.style.display = 'none';
+        loginContainer.style.display = 'block';
     });
 
     // Evento de Login
@@ -144,4 +154,88 @@ function handleFeedPage() {
 
     // Carrega o feed assim que a página é aberta
     loadFeed();
+}
+
+function handleProfilePage() {
+    const token = sessionStorage.getItem('accessToken');
+    if (!token) {
+        window.location.href = 'index.html';
+        return;
+    }
+
+    const profileForm = document.getElementById('profile-form');
+    const passwordForm = document.getElementById('password-form');
+    const profilePicPreview = document.getElementById('profile-pic-preview');
+
+    // Carrega os dados atuais do perfil
+    async function loadProfileData() {
+        const response = await fetch(`${API_URL}/profile/`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+
+        document.getElementById('username').value = data.username;
+        document.getElementById('bio').value = data.bio || '';
+        if (data.profile_picture) {
+            // A URL completa da imagem é o endereço do backend + a URL da mídia
+            profilePicPreview.src = `http://127.0.0.1:8000${data.profile_picture}`;
+        } else {
+            profilePicPreview.src = 'https://via.placeholder.com/100'; // Imagem padrão
+        }
+    }
+
+    // Evento para salvar as alterações do perfil
+    profileForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Usamos FormData para enviar texto e arquivos juntos
+        const formData = new FormData();
+        formData.append('username', document.getElementById('username').value);
+        formData.append('bio', document.getElementById('bio').value);
+
+        const imageInput = document.getElementById('profile_picture');
+        if (imageInput.files[0]) {
+            formData.append('profile_picture', imageInput.files[0]);
+        }
+        
+        const response = await fetch(`${API_URL}/profile/`, {
+            method: 'PUT', // ou PATCH se quiser atualizações parciais
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: formData // Não precisa de 'Content-Type', o navegador define automaticamente para FormData
+        });
+
+        if(response.ok) {
+            document.getElementById('profile-success').textContent = "Perfil atualizado com sucesso!";
+            loadProfileData(); // Recarrega os dados para mostrar a nova foto
+        }
+    });
+
+    // Evento para alterar a senha
+    passwordForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const old_password = document.getElementById('old_password').value;
+        const new_password = document.getElementById('new_password').value;
+
+        const response = await fetch(`${API_URL}/profile/change-password/`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ old_password, new_password })
+        });
+        
+        const data = await response.json();
+        
+        if(response.ok) {
+            document.getElementById('password-success').textContent = "Senha alterada com sucesso!";
+            document.getElementById('password-error').textContent = "";
+            passwordForm.reset();
+        } else {
+            document.getElementById('password-error').textContent = data.old_password || "Erro ao alterar a senha.";
+            document.getElementById('password-success').textContent = "";
+        }
+    });
+
+    loadProfileData();
 }

@@ -3,29 +3,64 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login & Registro | Clone Twitter</title>
+    <title>Swift Post</title>
     <link rel="stylesheet" href="static/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="shortcut icon" href="static/icone.png">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+    />
 </head>
 <body>
-    <div class="container">
-        <form id="login-form">
-            <h2>Login</h2>
-            <input type="text" id="login-username" placeholder="Usuário" required />
-            <input type="password" id="login-password" placeholder="Senha" required />
-            <button type="submit">Login</button>
-            <p id="login-error" class="error-message"></p>
-            <p>Não tem uma conta? <a href="#" id="show-register">Registre-se</a></p>
-        </form>
+    <img src="static/blob.svg" class="blob" />
+    <div class="orbit"></div>
 
-        <form id="register-form" style="display: none;">
-            <h2>Registrar</h2>
-            <input type="text" id="register-username" placeholder="Usuário" required />
-            <input type="email" id="register-email" placeholder="Email" required />
-            <input type="password" id="register-password" placeholder="Senha" required />
+    <div id="login-container" class="login">
+      <img src="static/Logo.png" class="logo" />
+      <h2>Bem-vindo de volta!</h2>
+      <h3>Faça o login para continuar!</h3>
+      <form class="form" id="login-form">
+        <div class="textbox">
+          <input required type="text" id="login-username" />
+          <label>Usuário</label>
+        </div>
+        <div class="textbox">
+          <input required type="password" id="login-password" />
+          <label>Senha</label>
+        </div>
+        <button type="submit">Login</button>
+      </form>
+      <p id="login-error" class="error-message"></p>
+      <p class="footer">Não tem uma conta? <a href="#" id="show-register">Registre-se!</a></p>
+    </div>
+
+    <div id="register-container" class="login" style="display: none;">
+        <img src="logo.svg" />
+        <h2>Crie sua conta</h2>
+        <h3>É rápido e fácil!</h3>
+        <form class="form" id="register-form">
+            <div class="textbox">
+              <input required type="text" id="register-username" />
+              <label>Usuário</label>
+            </div>
+            <div class="textbox">
+                <input required type="email" id="register-email" />
+                <label>Email</label>
+            </div>
+            <div class="textbox">
+              <input required type="password" id="register-password" />
+              <label>Senha</label>
+            </div>
             <button type="submit">Registrar</button>
-            <p id="register-error" class="error-message"></p>
-            <p>Já tem uma conta? <a href="#" id="show-login">Faça Login</a></p>
-        </form>
+          </form>
+          <p id="register-error" class="error-message"></p>
+          <p class="footer">Já tem uma conta? <a href="#" id="show-login">Faça Login!</a></p>
     </div>
     <script src="static/app.js"></script>
 </body>
