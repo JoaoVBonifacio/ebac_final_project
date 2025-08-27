@@ -1,5 +1,6 @@
 // frontend/static/app.js
 const API_URL = 'http://127.0.0.1:8000/api'; // URL base da sua API Django
+const BASE_URL = 'http://127.0.0.1:8000'; // URL base para mídias
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -9,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- LÓGICA DA PÁGINA DO FEED ---
-    if (document.getElementById('feed-container')) {
+    if (document.querySelector('.feed-layout')) {
         handleFeedPage();
     }
 
@@ -19,8 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Função para cuidar da página de autenticação
+// Função para cuidar da página de autenticação (sem alterações)
 function handleAuthPage() {
+    // ... (seu código existente aqui, sem nenhuma mudança)
     const loginContainer = document.getElementById('login-container');
     const registerContainer = document.getElementById('register-container');
 
@@ -81,19 +83,19 @@ function handleAuthPage() {
             if (!response.ok) throw new Error('Erro ao registrar. Tente outro usuário.');
 
             alert('Usuário registrado com sucesso! Faça o login.');
-            registerForm.style.display = 'none';
-            loginForm.style.display = 'block';
+            window.location.reload(); // Recarrega a página para mostrar o login
         } catch (error) {
             document.getElementById('register-error').textContent = error.message;
         }
     });
 }
 
-// Função para cuidar da página do feed
-function handleFeedPage() {
+
+// >>> Função do Feed ATUALIZADA <<<
+async function handleFeedPage() {
     const token = sessionStorage.getItem('accessToken');
     if (!token) {
-        window.location.href = 'index.html'; // Se não está logado, volta para o login
+        window.location.href = 'index.html';
         return;
     }
 
@@ -101,30 +103,78 @@ function handleFeedPage() {
     const newPostForm = document.getElementById('new-post-form');
     const logoutButton = document.getElementById('logout-button');
 
-    // Função para buscar e exibir os posts
+    // --- CARREGAR DADOS DO USUÁRIO LOGADO ---
+    async function loadCurrentUserData() {
+        try {
+            const response = await fetch(`${API_URL}/profile/`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!response.ok) throw new Error('Não foi possível carregar dados do usuário.');
+            
+            const user = await response.json();
+            const defaultAvatar = 'static/icone.png';
+            const userAvatarUrl = user.profile_picture ? `${BASE_URL}${user.profile_picture}` : defaultAvatar;
+
+            // Atualiza a barra lateral
+            document.getElementById('user-avatar-sidebar').src = userAvatarUrl;
+            document.getElementById('user-name-sidebar').textContent = user.username;
+            document.getElementById('user-username-sidebar').textContent = `@${user.username}`;
+            
+            // Atualiza a imagem no formulário de post
+            document.getElementById('user-avatar-post-form').src = userAvatarUrl;
+
+        } catch (error) {
+            console.error(error.message);
+        }
+    }
+
+
+    // --- FUNÇÃO PARA CARREGAR O FEED ---
     async function loadFeed() {
         try {
             const response = await fetch(`${API_URL}/feed/`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            if (response.status === 401) { // Token expirou ou inválido
+            if (response.status === 401) {
                  window.location.href = 'index.html';
                  return;
             }
+            if (!response.ok) throw new Error('Não foi possível carregar o feed.');
+
             const posts = await response.json();
-            feedContainer.innerHTML = ''; // Limpa o feed antes de adicionar novos posts
+            feedContainer.innerHTML = '';
+
+            if (posts.length === 0) {
+                 feedContainer.innerHTML = '<p style="padding: 15px;">Seu feed está vazio. Siga outros usuários para ver os posts deles aqui!</p>';
+            }
 
             posts.forEach(post => {
-                const postElement = document.createElement('div');
-                postElement.className = 'post';
-                postElement.innerHTML = `
-                    <p class="post-author"><strong>@${post.author.username}</strong></p>
-                    <p class="post-content">${post.content}</p>
-                `;
-                feedContainer.appendChild(postElement);
-            });
+    const postElement = document.createElement('article');
+    postElement.className = 'post glass-container'; // Adiciona a classe de vidro
+    
+    const authorAvatar = post.author.profile_picture ? `${BASE_URL}${post.author.profile_picture}` : 'static/icone.png';
+    const postDate = new Date(post.created_at).toLocaleDateString('pt-BR', { hour: '2-digit', minute: '2-digit'});
+
+    postElement.innerHTML = `
+        <img src="${authorAvatar}" alt="Avatar de ${post.author.username}" class="post-avatar">
+        <div class="post-body">
+            <div class="post-header">
+                <strong>${post.author.username}</strong>
+                <span>@${post.author.username} • ${postDate}</span>
+            </div>
+            <p class="post-content">${post.content}</p>
+            <div class="post-footer">
+                <div class="action"><span class="material-symbols-outlined">chat_bubble_outline</span> 0</div>
+                <div class="action"><span class="material-symbols-outlined">repeat</span> 0</div>
+                <div class="action"><span class="material-symbols-outlined">favorite_border</span> 0</div>
+                <div class="action"><span class="material-symbols-outlined">ios_share</span></div>
+            </div>
+        </div>
+    `;
+    feedContainer.appendChild(postElement);
+});
         } catch (error) {
-            feedContainer.innerHTML = '<p>Não foi possível carregar o feed.</p>';
+            feedContainer.innerHTML = `<p style="padding: 15px;">${error.message}</p>`;
         }
     }
 
@@ -132,6 +182,7 @@ function handleFeedPage() {
     newPostForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const content = document.getElementById('post-content').value;
+        if (!content.trim()) return; // Não posta se estiver vazio
 
         await fetch(`${API_URL}/posts/create/`, {
             method: 'POST',
@@ -141,8 +192,8 @@ function handleFeedPage() {
             },
             body: JSON.stringify({ content })
         });
-        document.getElementById('post-content').value = ''; // Limpa o campo
-        loadFeed(); // Recarrega o feed para mostrar o novo post
+        document.getElementById('post-content').value = '';
+        loadFeed();
     });
     
     // Evento de Logout
@@ -152,10 +203,12 @@ function handleFeedPage() {
     });
 
 
-    // Carrega o feed assim que a página é aberta
+    // Carrega tudo ao iniciar a página
+    loadCurrentUserData();
     loadFeed();
 }
 
+// Função para cuidar da página de perfil (sem alterações)
 function handleProfilePage() {
     const token = sessionStorage.getItem('accessToken');
     if (!token) {
@@ -177,18 +230,15 @@ function handleProfilePage() {
         document.getElementById('username').value = data.username;
         document.getElementById('bio').value = data.bio || '';
         if (data.profile_picture) {
-            // A URL completa da imagem é o endereço do backend + a URL da mídia
-            profilePicPreview.src = `http://127.0.0.1:8000${data.profile_picture}`;
+            profilePicPreview.src = `${BASE_URL}${data.profile_picture}`;
         } else {
-            profilePicPreview.src = 'https://via.placeholder.com/100'; // Imagem padrão
+            profilePicPreview.src = 'static/icone.png'; // Imagem padrão
         }
     }
 
     // Evento para salvar as alterações do perfil
     profileForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-
-        // Usamos FormData para enviar texto e arquivos juntos
         const formData = new FormData();
         formData.append('username', document.getElementById('username').value);
         formData.append('bio', document.getElementById('bio').value);
@@ -199,14 +249,16 @@ function handleProfilePage() {
         }
         
         const response = await fetch(`${API_URL}/profile/`, {
-            method: 'PUT', // ou PATCH se quiser atualizações parciais
+            method: 'PUT',
             headers: { 'Authorization': `Bearer ${token}` },
-            body: formData // Não precisa de 'Content-Type', o navegador define automaticamente para FormData
+            body: formData
         });
 
         if(response.ok) {
-            document.getElementById('profile-success').textContent = "Perfil atualizado com sucesso!";
-            loadProfileData(); // Recarrega os dados para mostrar a nova foto
+            alert("Perfil atualizado com sucesso!");
+            loadProfileData();
+        } else {
+            alert("Erro ao atualizar o perfil.");
         }
     });
 
@@ -225,15 +277,12 @@ function handleProfilePage() {
             body: JSON.stringify({ old_password, new_password })
         });
         
-        const data = await response.json();
-        
         if(response.ok) {
-            document.getElementById('password-success').textContent = "Senha alterada com sucesso!";
-            document.getElementById('password-error').textContent = "";
+            alert("Senha alterada com sucesso!");
             passwordForm.reset();
         } else {
-            document.getElementById('password-error').textContent = data.old_password || "Erro ao alterar a senha.";
-            document.getElementById('password-success').textContent = "";
+            const data = await response.json();
+            alert(data.old_password || "Erro ao alterar a senha.");
         }
     });
 

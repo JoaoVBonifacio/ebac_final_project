@@ -1,0 +1,810 @@
+/* ================================== */
+/* RESET BÁSICO              */
+/* ================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --color-primary: #0099ff; /* Azul vibrante principal */
+  --color-muted: #8899a6; /* Texto cinza suave */
+  --dark-background: #0d1117; /* Fundo mais escuro para o body */
+  --dark-container: #1e2732; /* Fundo para campos de input e elementos internos */
+  --glass-background: rgba(27, 34, 44, 0.7); /* Fundo semi-transparente para glassmorphism */
+  --glass-border: rgba(255, 255, 255, 0.1); /* Borda sutil de vidro */
+  --text-color: #e7e9ea; /* Cor padrão para texto claro */
+  --error-color: #ff4d4d; /* Cor para mensagens de erro */
+}
+
+body {
+  background-color: var(--dark-background);
+  color: var(--text-color);
+  font-family: "Poppins", "Euclid Circular A", sans-serif;
+  overflow-x: hidden; /* Evita rolagem horizontal */
+  min-height: 100vh; /* Garante que o body ocupe toda a altura */
+  position: relative; /* Para o background-stars */
+}
+
+/* Fundo de Estrelas para todas as páginas (exceto se sobrescrito) */
+.background-stars {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('https://www.transparenttextures.com/patterns/stardust.png'); /* Padrão de estrelas */
+  opacity: 0.3; /* Mais sutil */
+  z-index: -1; /* Fica abaixo de todo o conteúdo */
+}
+
+/* Efeito de Vidro (Glassmorphism) */
+.glass-container {
+  background: var(--glass-background);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); /* Para compatibilidade com Safari */
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); /* Sombra mais destacada para o efeito 3D */
+}
+
+/* ================================== */
+/* ESTILOS DA PÁGINA DE LOGIN  */
+/* ================================== */
+body.auth-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* `min-height: 100vh` já está no body, mas mantido aqui para clareza */
+}
+
+/* Esconder containers de login/registro por padrão */
+#login-container, #register-container {
+    display: none;
+}
+/* Mostrar apenas o login na página inicial por padrão */
+body.auth-page #login-container {
+    display: block;
+}
+
+
+.login {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centraliza verticalmente o conteúdo */
+  align-items: center;
+  width: 100%;
+  max-width: 450px;
+  min-height: 500px;
+  padding: 40px;
+  /* background e border-radius já serão aplicados pelo .glass-container */
+}
+
+.logo-login {
+  margin-bottom: 25px; /* Mais espaço abaixo do logo */
+  width: 120px; /* Logo um pouco maior */
+  height: auto;
+}
+
+.login h2 {
+  font-size: 28px; /* Texto maior */
+  font-weight: 700;
+  margin-bottom: 10px; /* Ajustado */
+  text-align: center;
+  color: var(--text-color);
+}
+
+.login p {
+  font-size: 16px;
+  color: var(--color-muted);
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.input-box {
+  position: relative;
+  width: 100%;
+  margin-bottom: 25px;
+}
+
+.input-box input {
+  width: 100%;
+  padding: 12px 15px;
+  background: var(--dark-container); /* Fundo do input mais escuro */
+  border: 1px solid var(--glass-border);
+  border-radius: 8px; /* Cantos mais arredondados */
+  color: var(--text-color);
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.input-box input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 153, 255, 0.3); /* Glow ao focar */
+}
+
+.input-box label {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  transform: translateY(-50%);
+  color: var(--color-muted);
+  font-size: 16px;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.input-box input:focus + label,
+.input-box input:not(:placeholder-shown) + label {
+  top: 0;
+  left: 10px;
+  font-size: 12px;
+  background-color: var(--glass-background); /* Fundo da label ao subir */
+  padding: 0 5px;
+  color: var(--color-primary);
+}
+
+.btn {
+  width: 100%;
+  padding: 12px 0;
+  background: var(--color-primary);
+  border: none;
+  border-radius: 8px; /* Cantos mais arredondados */
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn:hover {
+  background-color: #0056b3;
+}
+
+.link {
+  text-align: center;
+  margin-top: 25px; /* Mais espaço */
+  font-size: 15px;
+}
+
+.link a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.link a:hover {
+  color: #00beff;
+}
+
+.error-message {
+    color: var(--error-color);
+    font-size: 14px;
+    text-align: center;
+    margin-top: 15px;
+}
+
+/* ================================== */
+/* ESTILOS DA PÁGINA DO FEED   */
+/* ================================== */
+body.feed-body {
+  display: flex; /* Para centralizar o feed-layout */
+  justify-content: center;
+  align-items: flex-start; /* Alinha o conteúdo ao topo */
+  padding-top: 20px; /* Espaço do topo */
+}
+
+/* Removido `height: 100vh` do body para não cortar o conteúdo */
+
+
+/* Layout Principal */
+.feed-layout {
+  display: grid;
+  grid-template-columns: 275px minmax(0, 600px) 350px; /* Colunas definidas */
+  max-width: 1280px; /* Largura máxima do layout total */
+  width: 100%; /* Ocupa a largura disponível */
+  gap: 30px; /* Espaçamento entre as colunas */
+  min-height: calc(100vh - 40px); /* Garante altura mínima, considerando padding do body */
+  /* padding: 0 20px;  Já está no body.feed-body */
+}
+
+/* Coluna da Esquerda (Navegação) */
+.left-sidebar {
+  position: sticky; /* Fica fixo ao rolar */
+  top: 20px; /* Distância do topo */
+  height: calc(100vh - 40px); /* Altura da viewport menos o padding */
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Ocupa toda a altura da sidebar */
+}
+
+.logo-sidebar {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  text-decoration: none;
+  color: var(--text-color);
+  margin-bottom: 25px; /* Mais espaço abaixo do logo */
+  padding: 8px 10px; /* Padding para o hover */
+  border-radius: 9999px;
+  transition: background-color 0.2s;
+}
+.logo-sidebar:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.logo-sidebar img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+}
+
+.logo-sidebar span {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 30px; /* Espaço antes do botão de Postar */
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  text-decoration: none;
+  color: var(--text-color);
+  font-size: 19px;
+  padding: 12px;
+  border-radius: 9999px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.nav-link.active {
+  font-weight: bold;
+  color: var(--color-primary); /* Destaca o link ativo */
+}
+
+.nav-link .material-symbols-outlined {
+  font-size: 28px; /* Ícones um pouco maiores */
+}
+
+.post-button-sidebar {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 9999px;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%; /* Ocupa a largura total da sidebar */
+  transition: background-color 0.3s;
+}
+.post-button-sidebar:hover {
+  background-color: #0056b3;
+}
+
+.profile-section-sidebar {
+  margin-top: auto; /* Empurra para o final da coluna */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  border-radius: 9999px;
+  transition: background-color 0.2s;
+  cursor: pointer; /* Indica que é clicável */
+}
+.profile-section-sidebar:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.profile-section-sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit; /* Mantém a cor do texto */
+  flex-grow: 1;
+}
+
+#user-avatar-sidebar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-section-sidebar div {
+  display: flex;
+  flex-direction: column;
+}
+
+#user-username-sidebar {
+  color: var(--color-muted);
+}
+
+.logout-button-sidebar {
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+.logout-button-sidebar:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-color); /* Destaca o ícone ao passar o mouse */
+}
+
+/* Coluna Central (Feed) */
+.main-content {
+  /* padding-top: 20px; Removido, o padding já está no body.feed-body */
+  grid-column: 2; /* Garante que ocupe a segunda coluna */
+}
+
+.feed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  margin-bottom: 20px;
+  /* background e border-radius já serão aplicados pelo .glass-container */
+}
+
+.feed-header h2 {
+  font-size: 20px;
+  margin: 0; /* Remove margem padrão do h2 */
+}
+.feed-header .material-symbols-outlined {
+    color: var(--color-muted);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.feed-header .material-symbols-outlined:hover {
+    color: var(--color-primary);
+}
+
+
+.new-post-section {
+  display: flex;
+  gap: 15px;
+  padding: 15px;
+  margin-bottom: 20px;
+  /* background e border-radius já serão aplicados pelo .glass-container */
+}
+
+#user-avatar-post-form {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+#new-post-form {
+  width: 100%;
+}
+
+#new-post-form textarea {
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 18px;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  min-height: 60px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--glass-border); /* Linha divisória */
+}
+#new-post-form textarea::placeholder {
+    color: var(--color-muted);
+}
+
+
+.post-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.post-actions div { /* Container dos ícones de mídia */
+    display: flex;
+    gap: 15px;
+}
+
+.post-actions .material-symbols-outlined {
+  color: var(--color-primary); /* Ícones em azul */
+  cursor: pointer;
+  font-size: 24px;
+  transition: opacity 0.2s;
+}
+.post-actions .material-symbols-outlined:hover {
+    opacity: 0.8;
+}
+
+#new-post-form button {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 8px 18px; /* Padding ajustado */
+  border-radius: 9999px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+#new-post-form button:hover {
+  background-color: #0056b3;
+}
+
+
+/* Estilo de cada Post (Swift) */
+.post {
+  display: flex;
+  gap: 15px;
+  padding: 15px;
+  margin-bottom: 20px;
+  /* background e border-radius já serão aplicados pelo .glass-container */
+}
+.post:hover {
+  background-color: rgba(255, 255, 255, 0.03); /* Leve destaque ao passar o mouse */
+  cursor: pointer; /* Indica que o post é clicável */
+}
+
+.post-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.post-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 5px; /* Espaço entre o cabeçalho e o conteúdo */
+}
+.post-header strong {
+  color: var(--text-color);
+  font-weight: bold;
+  font-size: 16px;
+}
+.post-header span {
+  color: var(--color-muted);
+  font-size: 14px;
+}
+
+.post-body {
+  flex-grow: 1; /* Ocupa o resto do espaço */
+}
+
+.post-content {
+  margin: 5px 0 15px;
+  line-height: 1.5;
+  font-size: 16px;
+}
+
+.post-footer {
+  display: flex;
+  justify-content: space-between;
+  color: var(--color-muted);
+  font-size: 14px;
+}
+
+.post-footer .action {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.post-footer .action:hover {
+  color: var(--color-primary);
+}
+.post-footer .action .material-symbols-outlined {
+    font-size: 20px; /* Ícones de ação menores */
+}
+
+
+/* Coluna da Direita (Busca e Trends) */
+.right-sidebar {
+  position: sticky;
+  top: 20px; /* Distância do topo */
+  height: calc(100vh - 40px); /* Altura da viewport menos o padding */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-bottom: 20px; /* Padding na parte inferior */
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  gap: 10px;
+  /* background e border-radius já serão aplicados pelo .glass-container */
+}
+.search-box input {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 15px;
+  outline: none;
+  width: 100%;
+}
+.search-box input::placeholder {
+    color: var(--color-muted);
+}
+
+.search-box .material-symbols-outlined {
+  color: var(--color-muted);
+  font-size: 20px;
+}
+
+.trends-box, .who-to-follow-box {
+  padding: 20px;
+  /* background e border-radius já serão aplicados pelo .glass-container */
+}
+.trends-box h3, .who-to-follow-box h3 {
+  margin: 0 0 15px;
+  font-size: 19px;
+  color: var(--text-color);
+  font-weight: bold;
+}
+
+.trends-box ul, .who-to-follow-box ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.trends-box li {
+  margin-bottom: 15px;
+  font-size: 15px;
+}
+.trends-box li:last-child {
+  margin-bottom: 0;
+}
+
+.trends-box li a {
+  text-decoration: none;
+  color: var(--text-color);
+  font-weight: bold;
+  display: block;
+}
+.trends-box li a:hover {
+  color: var(--color-primary);
+}
+
+.trends-box li span {
+  display: block; /* Garante que o "posts" vá para a linha de baixo */
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.who-to-follow-box li {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Mais espaço entre avatar e info */
+  margin-bottom: 15px;
+}
+.who-to-follow-box li:last-child {
+    margin-bottom: 0;
+}
+
+.who-to-follow-box img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.user-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+.user-info strong {
+    font-size: 16px;
+}
+.user-info span {
+  color: var(--color-muted);
+  font-size: 14px;
+}
+.follow-button {
+  background-color: var(--text-color); /* Fundo branco/claro */
+  color: var(--dark-background); /* Texto escuro */
+  border: none;
+  padding: 8px 18px; /* Padding ajustado */
+  border-radius: 9999px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+.follow-button:hover {
+  background-color: #cfd9de; /* Levemente mais escuro no hover */
+}
+
+
+/* ================================== */
+/* ESTILOS DA PÁGINA DE PERFIL */
+/* ================================== */
+
+body.profile-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.profile-container {
+    width: 100%;
+    max-width: 700px;
+    padding: 30px;
+    position: relative;
+    /* Glass container já aplica background, border, shadow */
+}
+
+.back-to-feed-link {
+    position: absolute;
+    top: 25px; /* Ajustado */
+    left: 25px; /* Ajustado */
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Mais espaço */
+    text-decoration: none;
+    color: var(--color-muted);
+    font-size: 16px;
+    transition: color 0.3s;
+}
+.back-to-feed-link:hover {
+    color: var(--color-primary);
+}
+.back-to-feed-link .material-symbols-outlined {
+    font-size: 22px; /* Ícone um pouco maior */
+}
+
+.profile-container h2 {
+    text-align: center;
+    margin-bottom: 40px; /* Mais espaço abaixo do título principal */
+    color: var(--text-color);
+    font-size: 32px; /* Título maior */
+    font-weight: bold;
+}
+
+.profile-form-section {
+    margin-bottom: 40px; /* Espaçamento entre as seções */
+    padding-bottom: 30px; /* Mais padding antes da borda */
+    border-bottom: 1px solid var(--glass-border);
+}
+.profile-form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.profile-form-section h3 {
+    color: var(--color-primary);
+    font-size: 24px; /* Títulos de seção maiores */
+    margin-bottom: 25px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 16px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="password"],
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    background-color: var(--dark-container);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    color: var(--text-color);
+    font-size: 16px;
+    outline: none;
+    resize: vertical;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+.form-group input[type="text"]:focus,
+.form-group input[type="password"]:focus,
+.form-group textarea:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 153, 255, 0.3);
+}
+
+.form-group textarea {
+    min-height: 120px; /* Altura mínima maior para a bio */
+}
+
+.avatar-upload-area {
+    display: flex;
+    flex-direction: column; /* Coloca itens um abaixo do outro */
+    align-items: center; /* Centraliza horizontalmente */
+    gap: 20px;
+    margin-bottom: 30px; /* Mais espaço */
+}
+
+.profile-pic-preview {
+    width: 120px; /* Avatar maior */
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--color-primary);
+    box-shadow: 0 0 0 6px rgba(0, 153, 255, 0.2); /* Sombra maior */
+}
+
+.avatar-upload-area input[type="file"] {
+    max-width: 300px; /* Limita a largura do input de arquivo */
+    text-align: center; /* Centraliza o texto "Nenhum arquivo escolhido" */
+    background-color: var(--dark-container);
+    border: 1px dashed var(--glass-border);
+    border-radius: 8px;
+    padding: 10px;
+    color: var(--color-muted);
+    font-size: 15px;
+}
+.avatar-upload-area input[type="file"]::-webkit-file-upload-button {
+    visibility: hidden;
+    width: 0;
+    padding: 0;
+    margin: 0;
+}
+.avatar-upload-area input[type="file"]::before {
+    content: 'Escolher arquivo';
+    display: inline-block;
+    background: var(--color-primary);
+    color: white;
+    border-radius: 5px;
+    padding: 8px 15px;
+    outline: none;
+    white-space: nowrap;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 14px;
+    margin-right: 10px;
+    transition: background-color 0.3s;
+}
+.avatar-upload-area input[type="file"]:hover::before {
+    background: #0056b3;
+}
+.avatar-upload-area input[type="file"]:active::before {
+    background: #003d80;
+}
+
+
+.profile-form-section .btn {
+    width: auto;
+    padding: 12px 30px; /* Padding maior nos botões de ação */
+    margin-top: 25px; /* Mais espaço */
+    display: block; /* Para o margin-left: auto funcionar */
+    margin-left: auto; /* Alinha o botão à direita */
+    font-size: 17px;
+}

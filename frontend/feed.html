@@ -1,34 +1,108 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feed | Clone Twitter</title>
-    <link rel="stylesheet" href="static/style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Swift Post | Feed</title>
+    <link rel="stylesheet" href="static/feed.css" />
+    <link rel="shortcut icon" href="static/icone.png">
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+    />
 </head>
-<body>
-    <header>
-        <h1>Bem-vindo ao Feed</h1>
-    <div>
-        <a href="profile.html">Meu Perfil</a> <button id="logout-button">Sair</button>
-    </div>
-</header>
+<body class="feed-body">
 
-    <main>
-        <section class="new-post-section">
-            <h2>Criar novo post</h2>
-            <form id="new-post-form">
-                <textarea id="post-content" placeholder="O que está acontecendo?" required maxlength="280"></textarea>
-                <button type="submit">Postar</button>
-            </form>
-        </section>
+    <div class="background-stars"></div>
 
-        <section class="feed-section">
-            <h2>Seu Feed</h2>
-            <div id="feed-container">
+    <div class="feed-layout">
+        <nav class="left-sidebar glass-container">
+            <div class="sidebar-content">
+                <a href="feed.html" class="logo-sidebar">
+                    <img src="static/icone.png" alt="Logo Swift Post">
+                    <span>SWIFT POST</span>
+                </a>
+                
+                <div class="nav-links">
+                    <a href="feed.html" class="nav-link active"><span class="material-symbols-outlined">home</span> Página Inicial</a>
+                    <a href="#" class="nav-link"><span class="material-symbols-outlined">tag</span> Explorar</a>
+                    <a href="#" class="nav-link"><span class="material-symbols-outlined">notifications</span> Notificações</a>
+                    <a href="#" class="nav-link"><span class="material-symbols-outlined">mail</span> Mensagens</a>
+                    <a href="profile.html" class="nav-link"><span class="material-symbols-outlined">person</span> Perfil</a>
                 </div>
-        </section>
-    </main>
+
+                <button class="post-button-sidebar">Postar</button>
+
+                <div class="profile-section-sidebar">
+                    <a href="profile.html">
+                        <img id="user-avatar-sidebar" src="static/icone.png" alt="Seu avatar">
+                        <div>
+                            <strong id="user-name-sidebar">Carregando...</strong>
+                            <span id="user-username-sidebar">@...</span>
+                        </div>
+                    </a>
+                    <button id="logout-button" class="logout-button-sidebar"><span class="material-symbols-outlined">logout</span></button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <header class="feed-header glass-container">
+                <h2>Página Inicial</h2>
+                <span class="material-symbols-outlined">settings</span>
+            </header>
+
+            <section class="new-post-section glass-container">
+                <img id="user-avatar-post-form" src="static/icone.png" alt="Seu avatar">
+                <form id="new-post-form">
+                    <textarea id="post-content" placeholder="O que está acontecendo?" required maxlength="280"></textarea>
+                    <div class="post-actions">
+                        <div>
+                            <span class="material-symbols-outlined">image</span>
+                            <span class="material-symbols-outlined">gif_box</span>
+                            <span class="material-symbols-outlined">ballot</span>
+                        </div>
+                        <button type="submit">Postar</button>
+                    </div>
+                </form>
+            </section>
+
+            <section id="feed-container">
+                </section>
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="search-box glass-container">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" placeholder="Buscar no Swift Post">
+            </div>
+
+            <div class="trends-box glass-container">
+                <h3>O que está em alta</h3>
+                <ul>
+                    <li><a href="#">#TechNews</a><span>1,234 posts</span></li>
+                    <li><a href="#">#DjangoDev</a><span>987 posts</span></li>
+                    <li><a href="#">#EBAC</a><span>753 posts</span></li>
+                    <li><a href="#">#JavaScript</a><span>512 posts</span></li>
+                </ul>
+            </div>
+
+            <div class="who-to-follow-box glass-container">
+                <h3>Quem Seguir</h3>
+                <ul>
+                    <li>
+                        <img src="static/icone.png" alt="Avatar">
+                        <div class="user-info">
+                            <strong>Robo Dev</strong>
+                            <span>@robo_dev</span>
+                        </div>
+                        <button class="follow-button">Seguir</button>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+    </div>
+
     <script src="static/app.js"></script>
 </body>
 </html>

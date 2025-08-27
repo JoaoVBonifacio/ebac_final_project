@@ -1,49 +1,58 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <title>Editar Perfil</title>
-    <link rel="stylesheet" href="static/style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Swift Post | Perfil</title>
+    <link rel="stylesheet" href="static/profile.css" />
+    <link rel="shortcut icon" href="static/icone.png">
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+    />
 </head>
-<body>
-    <header>
-        <h1>Editar Perfil</h1>
-        <a href="feed.html">Voltar para o Feed</a>
-    </header>
+<body class="profile-page">
+    <div class="background-stars"></div>
 
-    <main>
-        <form id="profile-form">
-            <h2>Seus Dados</h2>
-            <img id="profile-pic-preview" src="" alt="Foto de Perfil" width="100">
-            
-            <label for="profile_picture">Mudar foto de perfil:</label>
-            <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
+    <div class="profile-container glass-container">
+        <a href="feed.html" class="back-to-feed-link">
+            <span class="material-symbols-outlined">arrow_back</span> Voltar para o Feed
+        </a>
+        <h2>Editar Perfil</h2>
 
-            <label for="username">Nome de usuário:</label>
-            <input type="text" id="username" name="username" required>
-            
-            <label for="bio">Bio:</label>
-            <textarea id="bio" name="bio"></textarea>
-
-            <button type="submit">Salvar Alterações</button>
-            <p id="profile-success" class="success-message"></p>
+        <form id="profile-form" class="profile-form-section">
+            <h3>Seus Dados</h3>
+            <div class="form-group">
+                <label for="profile_picture">Foto de Perfil</label>
+                <div class="avatar-upload-area">
+                    <img id="profile-pic-preview" src="static/icone.png" alt="Pré-visualização do avatar" class="profile-pic-preview">
+                    <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="username">Nome de Usuário</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="bio">Bio</label>
+                <textarea id="bio" name="bio" rows="4"></textarea>
+            </div>
+            <button type="submit" class="btn">Salvar Alterações</button>
         </form>
 
-        <hr>
-
-        <form id="password-form">
-            <h2>Alterar Senha</h2>
-            <label for="old_password">Senha Antiga:</label>
-            <input type="password" id="old_password" required>
-            
-            <label for="new_password">Nova Senha:</label>
-            <input type="password" id="new_password" required>
-
-            <button type="submit">Alterar Senha</button>
-            <p id="password-error" class="error-message"></p>
-            <p id="password-success" class="success-message"></p>
+        <form id="password-form" class="profile-form-section">
+            <h3>Alterar Senha</h3>
+            <div class="form-group">
+                <label for="old_password">Senha Antiga</label>
+                <input type="password" id="old_password" name="old_password" required>
+            </div>
+            <div class="form-group">
+                <label for="new_password">Nova Senha</label>
+                <input type="password" id="new_password" name="new_password" required>
+            </div>
+            <button type="submit" class="btn">Alterar Senha</button>
         </form>
-    </main>
+    </div>
 
     <script src="static/app.js"></script>
 </body>

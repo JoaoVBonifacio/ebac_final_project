@@ -1,0 +1,397 @@
+/* Reset Básico e Variáveis Globais */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --color-primary: #0099ff; /* Azul mais vibrante da imagem */
+  --color-muted: #8899a6;
+  --dark-background: #0d1117;
+  --glass-background: rgba(27, 34, 44, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --text-color: #e7e9ea;
+}
+
+/* Estilo do Body (para ambas as páginas) */
+body {
+  background-color: var(--dark-background);
+  color: var(--text-color);
+  font-family: "Poppins", "Euclid Circular A", sans-serif;
+  overflow-x: hidden;
+}
+
+/* ================================== */
+/* ESTILOS DA PÁGINA DE LOGIN         */
+/* ================================== */
+.auth-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+/* ... (Seu CSS de login anterior pode ser mantido aqui se desejar, mas o foco é o feed) ... */
+
+
+/* ================================== */
+/* ESTILOS DA PÁGINA DO FEED          */
+/* ================================== */
+
+.feed-body {
+  display: flex;
+  justify-content: center;
+}
+
+.background-stars {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+  opacity: 0.3;
+  z-index: -1;
+}
+
+/* Efeito de Vidro (Glassmorphism) */
+.glass-container {
+  background: var(--glass-background);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+}
+
+/* Layout Principal */
+.feed-layout {
+  display: grid;
+  grid-template-columns: 275px minmax(0, 600px) 350px;
+  max-width: 1280px;
+  width: 100%;
+  gap: 30px;
+  padding: 0 20px;
+}
+
+/* Coluna da Esquerda (Navegação) */
+.left-sidebar {
+  position: sticky;
+  top: 20px;
+  height: calc(100vh - 40px);
+  padding: 20px;
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.logo-sidebar {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  text-decoration: none;
+  color: var(--text-color);
+  margin-bottom: 20px;
+}
+
+.logo-sidebar img {
+  width: 40px;
+  height: 40px;
+}
+
+.logo-sidebar span {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  text-decoration: none;
+  color: var(--text-color);
+  font-size: 19px;
+  padding: 12px;
+  border-radius: 9999px;
+  transition: background-color 0.2s;
+}
+
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.nav-link.active {
+  font-weight: bold;
+}
+
+.post-button-sidebar {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 9999px;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.3s;
+}
+.post-button-sidebar:hover {
+  filter: brightness(0.9);
+}
+
+.profile-section-sidebar {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  border-radius: 9999px;
+}
+
+.profile-section-sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+  flex-grow: 1;
+}
+
+#user-avatar-sidebar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-section-sidebar div {
+  display: flex;
+  flex-direction: column;
+}
+
+#user-username-sidebar {
+  color: var(--color-muted);
+}
+
+.logout-button-sidebar {
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+}
+.logout-button-sidebar:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Coluna Central (Feed) */
+.main-content {
+  padding-top: 20px;
+}
+
+.feed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.feed-header h2 {
+  font-size: 20px;
+}
+
+.new-post-section {
+  display: flex;
+  gap: 15px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+#user-avatar-post-form {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+#new-post-form {
+  width: 100%;
+}
+
+#new-post-form textarea {
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 18px;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  min-height: 60px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.post-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.post-actions span {
+  color: var(--color-primary);
+  cursor: pointer;
+  margin-right: 15px;
+}
+
+#new-post-form button {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Estilo de cada Post */
+.post {
+  display: flex;
+  gap: 15px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.post-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.post-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.post-header strong {
+  color: var(--text-color);
+}
+.post-header span {
+  color: var(--color-muted);
+  font-size: 15px;
+}
+
+.post-content {
+  margin: 5px 0 15px;
+  line-height: 1.5;
+}
+
+.post-footer {
+  display: flex;
+  justify-content: space-between;
+  color: var(--color-muted);
+}
+
+.post-footer .action {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+.post-footer .action:hover {
+  color: var(--color-primary);
+}
+
+
+/* Coluna da Direita */
+.right-sidebar {
+  position: sticky;
+  top: 20px;
+  height: calc(100vh - 40px);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  gap: 10px;
+}
+.search-box input {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 15px;
+  outline: none;
+  width: 100%;
+}
+.search-box .material-symbols-outlined {
+  color: var(--color-muted);
+}
+
+.trends-box, .who-to-follow-box {
+  padding: 20px;
+}
+.trends-box h3, .who-to-follow-box h3 {
+  margin: 0 0 15px;
+  font-size: 19px;
+}
+
+.trends-box ul, .who-to-follow-box ul {
+  list-style: none;
+}
+
+.trends-box li {
+  margin-bottom: 15px;
+}
+.trends-box li a {
+  text-decoration: none;
+  color: var(--text-color);
+  font-weight: bold;
+}
+.trends-box li span {
+  display: block;
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.who-to-follow-box li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.who-to-follow-box img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.user-info {
+  flex-grow: 1;
+}
+.user-info span {
+  color: var(--color-muted);
+}
+.follow-button {
+  background-color: var(--text-color);
+  color: var(--dark-background);
+  border: none;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-weight: bold;
+  cursor: pointer;
+}
