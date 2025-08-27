@@ -116,7 +116,7 @@ async function handleFeedPage() {
             currentUserFollowingIds = user.following || [];
 
             const defaultAvatar = 'static/icone.png';
-            const userAvatarUrl = user.profile_picture ? `${BASE_URL}${user.profile_picture}` : defaultAvatar;
+            const userAvatarUrl = user.profile_picture ? user.profile_picture : defaultAvatar;
 
             document.getElementById('user-avatar-sidebar').src = userAvatarUrl;
             document.getElementById('user-name-sidebar').textContent = user.username;
@@ -152,7 +152,7 @@ async function handleFeedPage() {
             posts.forEach(post => {
                 const postElement = document.createElement('article');
                 postElement.className = 'post glass-container';
-                const authorAvatar = post.author.profile_picture ? `${BASE_URL}${post.author.profile_picture}` : 'static/icone.png';
+                const authorAvatar = post.author.profile_picture ? post.author.profile_picture : 'static/icone.png';
                 const postDate = new Date(post.created_at).toLocaleDateString('pt-BR', { hour: '2-digit', minute: '2-digit'});
 
                 postElement.innerHTML = `
@@ -192,7 +192,7 @@ async function handleFeedPage() {
                 // AGORA USAMOS A VARIÁVEL CONFIÁVEL
                 const isFollowing = currentUserFollowingIds.includes(user.id);
                 
-                const userAvatar = user.profile_picture ? `${BASE_URL}${user.profile_picture}` : 'static/icone.png';
+                const userAvatar = user.profile_picture ? user.profile_picture : 'static/icone.png';
                 const userElement = document.createElement('li');
                 userElement.innerHTML = `
                     <img src="${userAvatar}" alt="Avatar de ${user.username}">
@@ -273,7 +273,6 @@ async function handleFeedPage() {
     loadUsers();                 // Carrega a lista de "Quem Seguir"
 }
 
-// Função para cuidar da página de perfil (sem alterações)
 function handleProfilePage() {
     const token = sessionStorage.getItem('accessToken');
     if (!token) {
@@ -285,51 +284,73 @@ function handleProfilePage() {
     const passwordForm = document.getElementById('password-form');
     const profilePicPreview = document.getElementById('profile-pic-preview');
 
-    // Carrega os dados atuais do perfil
-    async function loadProfileData() {
-        const response = await fetch(`${API_URL}/profile/`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await response.json();
+    console.log('Elemento da foto de perfil encontrado:', profilePicPreview);
 
-        document.getElementById('username').value = data.username;
-        document.getElementById('bio').value = data.bio || '';
-        if (data.profile_picture) {
-            profilePicPreview.src = `${BASE_URL}${data.profile_picture}`;
-        } else {
-            profilePicPreview.src = 'static/icone.png'; // Imagem padrão
+    // ESTA É A FUNÇÃO CORRIGIDA PARA BUSCAR E EXIBIR OS DADOS
+    async function loadProfileData() {
+        try {
+            const response = await fetch(`${API_URL}/profile/`, {
+                headers: { 'Authorization': `Bearer ${token}` },
+                // FORÇA O NAVEGADOR A BUSCAR NOVOS DADOS DA API, IGNORANDO O CACHE
+                cache: 'no-cache'
+            });
+            const data = await response.json();
+
+            document.getElementById('username').value = data.username;
+            document.getElementById('bio').value = data.bio || '';
+            
+            if (data.profile_picture) {
+                // FORÇA O NAVEGADOR A RECARREGAR A IMAGEM, IGNORANDO O CACHE
+                profilePicPreview.src = `${data.profile_picture}?_=${new Date().getTime()}`;
+            } else {
+                profilePicPreview.src = 'static/icone.png';
+            }
+        } catch (error) {
+            console.error("Erro ao carregar dados do perfil:", error);
+            alert("Não foi possível carregar os dados do perfil.");
         }
     }
 
-    // Evento para salvar as alterações do perfil
+    // ESTE É O EVENTO CORRIGIDO PARA SALVAR AS ALTERAÇÕES
     profileForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const formData = new FormData();
-        formData.append('username', document.getElementById('username').value);
-        formData.append('bio', document.getElementById('bio').value);
+        try {
+            const formData = new FormData();
+            formData.append('username', document.getElementById('username').value);
+            formData.append('bio', document.getElementById('bio').value);
 
-        const imageInput = document.getElementById('profile_picture');
-        if (imageInput.files[0]) {
-            formData.append('profile_picture', imageInput.files[0]);
-        }
-        
-        const response = await fetch(`${API_URL}/profile/`, {
-            method: 'PUT',
-            headers: { 'Authorization': `Bearer ${token}` },
-            body: formData
-        });
+            const imageInput = document.getElementById('profile_picture');
+            if (imageInput.files[0]) {
+                formData.append('profile_picture', imageInput.files[0]);
+            }
 
-        if(response.ok) {
+            const response = await fetch(`${API_URL}/profile/`, {
+                method: 'PATCH',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                const errorMessage = Object.entries(errorData).map(([key, value]) => `${key}: ${value}`).join("\n");
+                throw new Error(errorMessage);
+            }
+
             alert("Perfil atualizado com sucesso!");
+            
+            // APÓS O SUCESSO, CHAMAMOS A FUNÇÃO QUE BUSCA OS DADOS FRESCOS DO SERVIDOR
             loadProfileData();
-        } else {
-            alert("Erro ao atualizar o perfil.");
+
+        } catch (error) {
+            console.error('Falha ao atualizar o perfil:', error);
+            alert(`Ocorreu um erro ao atualizar o perfil:\n${error.message}`);
         }
     });
 
-    // Evento para alterar a senha
+    // O formulário de senha continua igual
     passwordForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        // ... (código do formulário de senha continua o mesmo)
         const old_password = document.getElementById('old_password').value;
         const new_password = document.getElementById('new_password').value;
 
@@ -351,5 +372,6 @@ function handleProfilePage() {
         }
     });
 
+    // Carga inicial dos dados
     loadProfileData();
 }
