@@ -1,6 +1,12 @@
 // frontend/static/app.js
-const API_URL = 'http://127.0.0.1:8000/api'; // URL base da sua API Django
-const BASE_URL = 'http://127.0.0.1:8000'; // URL base para mídias
+const API_URL = '/api'; // URL base da sua API Django
+const BASE_URL = ''; // URL base para mídias
+
+// Verifica se estamos em ambiente de desenvolvimento local (rodando com o Live Server)
+if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
+  API_URL = 'http://127.0.0.1:8000/api';
+  BASE_URL = 'http://127.0.0.1:8000';
+}
 
 document.addEventListener('DOMContentLoaded', () => {
 
