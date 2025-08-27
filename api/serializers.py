@@ -1,0 +1,26 @@
+# api/serializers.py
+from rest_framework import serializers
+from .models import User, Post
+
+class UserRegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password']
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def create(self, validated_data):
+        # Cria o usuário com a senha criptografada
+        user = User.objects.create_user(**validated_data)
+        return user
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'bio', 'profile_picture']
+
+class PostSerializer(serializers.ModelSerializer):
+    author = ProfileSerializer(read_only=True) # Mostra os dados do autor
+
+    class Meta:
+        model = Post
+        fields = ['id', 'author', 'content', 'created_at', 'likes']

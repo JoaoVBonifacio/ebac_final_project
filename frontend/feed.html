@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feed | Clone Twitter</title>
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+    <header>
+        <h1>Bem-vindo ao Feed</h1>
+        <button id="logout-button">Sair</button>
+    </header>
+
+    <main>
+        <section class="new-post-section">
+            <h2>Criar novo post</h2>
+            <form id="new-post-form">
+                <textarea id="post-content" placeholder="O que está acontecendo?" required maxlength="280"></textarea>
+                <button type="submit">Postar</button>
+            </form>
+        </section>
+
+        <section class="feed-section">
+            <h2>Seu Feed</h2>
+            <div id="feed-container">
+                </div>
+        </section>
+    </main>
+    <script src="static/app.js"></script>
+</body>
+</html>

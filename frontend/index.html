@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login & Registro | Clone Twitter</title>
+    <link rel="stylesheet" href="static/style.css" />
+</head>
+<body>
+    <div class="container">
+        <form id="login-form">
+            <h2>Login</h2>
+            <input type="text" id="login-username" placeholder="Usuário" required />
+            <input type="password" id="login-password" placeholder="Senha" required />
+            <button type="submit">Login</button>
+            <p id="login-error" class="error-message"></p>
+            <p>Não tem uma conta? <a href="#" id="show-register">Registre-se</a></p>
+        </form>
+
+        <form id="register-form" style="display: none;">
+            <h2>Registrar</h2>
+            <input type="text" id="register-username" placeholder="Usuário" required />
+            <input type="email" id="register-email" placeholder="Email" required />
+            <input type="password" id="register-password" placeholder="Senha" required />
+            <button type="submit">Registrar</button>
+            <p id="register-error" class="error-message"></p>
+            <p>Já tem uma conta? <a href="#" id="show-login">Faça Login</a></p>
+        </form>
+    </div>
+    <script src="static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+/* frontend/static/style.css */
+body { font-family: sans-serif; background-color: #f0f2f5; }
+.container, main { max-width: 600px; margin: 50px auto; padding: 20px; background: white; border-radius: 8px; }
+input { display: block; width: 95%; padding: 10px; margin-bottom: 10px; }
+button { padding: 10px 15px; }
+.error-message { color: red; font-size: 0.9em; }
+.post { border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
+.post-author { font-weight: bold; margin-bottom: 5px; }
+textarea { width: 95%; min-height: 80px; }
+header { display: flex; justify-content: space-between; align-items: center; }
