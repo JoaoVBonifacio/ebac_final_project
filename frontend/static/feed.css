@@ -581,6 +581,54 @@ body {
   }
 }
 
+/* --- BARRA DE NAVEGAÇÃO INFERIOR --- */
+
+.bottom-nav {
+  /* Escondido por padrão em telas grandes */
+  display: none;
+  
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  
+  /* Ajustes no efeito de vidro para a barra */
+  border-radius: 0;
+  border-top: 1px solid var(--glass-border);
+  border-bottom: 0;
+  border-left: 0;
+  border-right: 0;
+
+  /* Alinhamento dos ícones */
+  justify-content: space-around;
+  align-items: center;
+}
+
+.bottom-nav .nav-link {
+  padding: 10px;
+}
+
+/* --- AJUSTES DE RESPONSIVIDADE --- */
+
+/* Para telas de até 768px (tablets em retrato e celulares grandes) */
+@media (max-width: 768px) {
+  /* Mostra a barra de navegação inferior */
+  .bottom-nav {
+    display: flex;
+  }
+
+  /* Adiciona um espaço no final do feed para não ser coberto pela barra */
+  .feed-body {
+    padding-bottom: 70px; 
+  }
+
+  /* Esconde o botão de postar da barra lateral (que já está escondida) */
+  .post-button-sidebar {
+      display: none;
+  }
+}
+
 /* ================================== */
 /* RESPONSIVIDADE                     */
 /* ================================== */
