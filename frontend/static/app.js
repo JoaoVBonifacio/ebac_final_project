@@ -105,6 +105,12 @@ async function handleFeedPage() {
         return;
     }
 
+    // --- CORREÇÃO: DECLARE AS VARIÁVEIS DE ELEMENTOS AQUI NO TOPO ---
+    const feedContainer = document.getElementById('feed-container');
+    const newPostForm = document.getElementById('new-post-form');
+    const logoutButton = document.getElementById('logout-button');
+    const usersContainer = document.querySelector('.who-to-follow-box ul');
+
     // Variável para guardar a lista de quem o usuário logado segue
     let currentUserFollowingIds = [];
 
@@ -162,21 +168,33 @@ async function handleFeedPage() {
                 const postDate = new Date(post.created_at).toLocaleDateString('pt-BR', { hour: '2-digit', minute: '2-digit'});
 
                 postElement.innerHTML = `
-                    <img src="${authorAvatar}" alt="Avatar de ${post.author.username}" class="post-avatar">
-                    <div class="post-body">
-                        <div class="post-header">
-                            <strong>${post.author.username}</strong>
-                            <span>@${post.author.username} • ${postDate}</span>
-                        </div>
-                        <p class="post-content">${post.content}</p>
-                        <div class="post-footer">
-                            <div class="action"><span class="material-symbols-outlined">chat_bubble_outline</span> 0</div>
-                            <div class="action"><span class="material-symbols-outlined">repeat</span> 0</div>
-                            <div class="action"><span class="material-symbols-outlined">favorite_border</span> 0</div>
-                            <div class="action"><span class="material-symbols-outlined">ios_share</span></div>
-                        </div>
-                    </div>
-                `;
+    <img src="${authorAvatar}" alt="Avatar de ${post.author.username}" class="post-avatar">
+    <div class="post-body">
+        <div class="post-header">
+            <strong>${post.author.username}</strong>
+            <span>@${post.author.username} • ${postDate}</span>
+        </div>
+        <p class="post-content">${post.content}</p>
+        
+        <div class="post-footer">
+            <div class="action action-comment">
+                <span class="material-symbols-outlined">chat_bubble_outline</span>
+                <span class="comment-count">${post.comments_count}</span>
+            </div>
+            <div class="action action-retweet">
+                <span class="material-symbols-outlined">repeat</span> 0
+            </div>
+            <div class="action action-like" data-post-id="${post.id}">
+                <span class="material-symbols-outlined like-icon">
+                    ${post.user_has_liked ? 'favorite' : 'favorite_border'}
+                </span>
+                <span class="like-count">${post.likes_count}</span>
+            </div>
+            <div class="action action-share">
+                <span class="material-symbols-outlined">ios_share</span>
+            </div>
+        </div> </div>
+`;
                 feedContainer.appendChild(postElement);
             });
         } catch (error) {
@@ -273,6 +291,149 @@ async function handleFeedPage() {
         window.location.href = 'index.html';
     });
 
+    // --- EVENT LISTENER PARA CURTIR POSTS ---
+    feedContainer.addEventListener('click', async (e) => {
+    // Procura por um elemento pai com a classe 'action-like'
+        const likeButton = e.target.closest('.action-like');
+        if (!likeButton) return;
+
+        const postId = likeButton.dataset.postId;
+        const token = sessionStorage.getItem('accessToken');
+
+        try {
+            const response = await fetch(`${API_URL}/posts/${postId}/like/`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                // Atualiza o contador de likes e o ícone do coração
+                const likeCountElement = likeButton.querySelector('.like-count');
+                const likeIconElement = likeButton.querySelector('.like-icon');
+            
+                likeCountElement.textContent = data.likes_count;
+                likeIconElement.textContent = data.liked ? 'favorite' : 'favorite_border';
+            }
+        } catch (error) {
+            console.error("Erro ao curtir o post:", error);
+        }
+    });
+
+    // --- LÓGICA DO MODAL DE COMENTÁRIOS ---
+    const commentModalOverlay = document.getElementById('comment-modal-overlay');
+    const closeCommentModalBtn = document.getElementById('close-comment-modal');
+    let activePostId = null;
+
+    // Função para abrir o modal
+   async function openCommentModal(postId) {
+    activePostId = postId;
+    const modalPostContainer = document.getElementById('modal-post-container');
+    const modalCommentsList = document.getElementById('modal-comments-list');
+    
+    // Limpa conteúdo anterior
+    modalPostContainer.innerHTML = 'Carregando post...';
+    modalCommentsList.innerHTML = 'Carregando comentários...';
+    commentModalOverlay.classList.remove('hidden');
+
+    // --- NOVO: BUSCA E RENDERIZA O POST ORIGINAL NO MODAL ---
+    const postResponse = await fetch(`${API_URL}/feed/?post_id=${postId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+    const postData = await postResponse.json();
+    const originalPost = postData.results ? postData.results[0] : postData[0]; // Ajuste para o formato da API (array ou results)
+
+    if (originalPost) {
+        const authorAvatar = originalPost.author.profile_picture ? originalPost.author.profile_picture : 'static/icone.png';
+        const postDate = new Date(originalPost.created_at).toLocaleDateString('pt-BR', { hour: '2-digit', minute: '2-digit'});
+        modalPostContainer.innerHTML = `
+            <div class="post modal-original-post">
+                <img src="${authorAvatar}" alt="Avatar de ${originalPost.author.username}" class="post-avatar">
+                <div class="post-body">
+                    <div class="post-header">
+                        <strong>${originalPost.author.username}</strong>
+                        <span>@${originalPost.author.username} • ${postDate}</span>
+                    </div>
+                    <p class="post-content">${originalPost.content}</p>
+                </div>
+            </div>
+        `;
+    } else {
+        modalPostContainer.innerHTML = '<p>Não foi possível carregar o post original.</p>';
+    }
+    // --- FIM DO NOVO BLOCO ---
+
+
+    // Busca os comentários e o post
+    const response = await fetch(`${API_URL}/posts/${postId}/comments/`, { headers: { 'Authorization': `Bearer ${token}` } });
+    const comments = await response.json();
+    
+    // Renderiza os comentários
+    modalCommentsList.innerHTML = '';
+    if (comments.length === 0) {
+        modalCommentsList.innerHTML = '<p class="no-comments-message">Nenhum comentário ainda. Seja o primeiro a responder!</p>';
+    } else {
+        comments.forEach(comment => {
+            const commentEl = document.createElement('div');
+            commentEl.className = 'post comment-item glass-container'; // Adicione uma nova classe para estilizar
+            const commentAuthorAvatar = comment.author.profile_picture ? comment.author.profile_picture : 'static/icone.png';
+            const commentDate = new Date(comment.created_at).toLocaleDateString('pt-BR', { hour: '2-digit', minute: '2-digit'});
+            commentEl.innerHTML = `
+                <img src="${commentAuthorAvatar}" alt="Avatar de ${comment.author.username}" class="post-avatar">
+                <div class="post-body">
+                    <div class="post-header">
+                        <strong>${comment.author.username}</strong>
+                        <span>@${comment.author.username} • ${commentDate}</span>
+                    </div>
+                    <p class="post-content">${comment.content}</p>
+                </div>
+            `;
+            modalCommentsList.appendChild(commentEl);
+        });
+    }
+}
+
+    // Função para fechar o modal
+    function closeCommentModal() {
+        commentModalOverlay.classList.add('hidden');
+        activePostId = null;
+    }
+
+    // Evento para abrir o modal ao clicar no post
+    feedContainer.addEventListener('click', (e) => {
+    const postElement = e.target.closest('.post');
+    const commentButton = e.target.closest('.action-comment');
+
+    // Se clicou no botão de comentário OU no corpo do post (mas não em outro botão de ação)
+    if (postElement && (commentButton || !e.target.closest('.action'))) {
+        const likeButton = postElement.querySelector('.action-like');
+        if (likeButton) {
+                openCommentModal(likeButton.dataset.postId);
+            }
+        }
+    });
+    
+    // Eventos para fechar o modal
+    closeCommentModalBtn.addEventListener('click', closeCommentModal);
+    commentModalOverlay.addEventListener('click', (e) => {
+        if (e.target === commentModalOverlay) closeCommentModal();
+    });
+
+    // Evento para submeter um novo comentário
+    document.getElementById('comment-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const content = document.getElementById('comment-text').value;
+        if (!content.trim() || !activePostId) return;
+
+        await fetch(`${API_URL}/posts/${activePostId}/comments/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ content })
+        });
+
+        document.getElementById('comment-text').value = ''; // Limpa o campo
+        openCommentModal(activePostId); // Recarrega os comentários
+        loadFeed(); // Recarrega o feed para atualizar a contagem
+    });
+
     // --- CARREGA TUDO EM ORDEM ---
     await loadCurrentUserData(); // Espera carregar os dados do usuário primeiro
     loadFeed();                  // Carrega o feed
@@ -290,9 +451,53 @@ function handleProfilePage() {
     const passwordForm = document.getElementById('password-form');
     const profilePicPreview = document.getElementById('profile-pic-preview');
 
-    console.log('Elemento da foto de perfil encontrado:', profilePicPreview);
+    // --- FUNÇÃO QUE FALTAVA ---
+    // Carrega as listas de seguidos e seguidores
+    async function loadFollowLists() {
+    const followingList = document.getElementById('following-list');
+    const followersList = document.getElementById('followers-list');
+    if (!followingList || !followersList) return;
 
-    // ESTA É A FUNÇÃO CORRIGIDA PARA BUSCAR E EXIBIR OS DADOS
+    try {
+        // Busca a lista de quem o usuário segue
+        const followingResponse = await fetch(`${API_URL}/profile/following/`, { headers: { 'Authorization': `Bearer ${token}` } });
+        const followingData = await followingResponse.json(); // followingData agora é a lista [...]
+        followingList.innerHTML = '';
+        
+        // CORREÇÃO: Usamos a lista diretamente
+        if (followingData.length > 0) {
+            followingData.forEach(user => {
+                const userElement = document.createElement('li');
+                userElement.textContent = `@${user.username}`;
+                followingList.appendChild(userElement);
+            });
+        } else {
+            followingList.innerHTML = '<li>Você não segue ninguém ainda.</li>';
+        }
+        
+        // Busca a lista de seguidores
+        const followersResponse = await fetch(`${API_URL}/profile/followers/`, { headers: { 'Authorization': `Bearer ${token}` } });
+        const followersData = await followersResponse.json(); // followersData agora é a lista [...]
+        followersList.innerHTML = '';
+
+        // CORREÇÃO: Usamos a lista diretamente
+        if (followersData.length > 0) {
+            followersData.forEach(user => {
+                const userElement = document.createElement('li');
+                userElement.textContent = `@${user.username}`;
+                followersList.appendChild(userElement);
+            });
+        } else {
+            followersList.innerHTML = '<li>Nenhum seguidor ainda.</li>';
+        }
+    } catch (error) {
+        console.error("Erro ao carregar listas de seguidores:", error);
+        followingList.innerHTML = '<li>Erro ao carregar.</li>';
+        followersList.innerHTML = '<li>Erro ao carregar.</li>';
+    }
+}
+
+     // ESTA É A FUNÇÃO CORRIGIDA PARA BUSCAR E EXIBIR OS DADOS
     async function loadProfileData() {
         try {
             const response = await fetch(`${API_URL}/profile/`, {
@@ -378,6 +583,7 @@ function handleProfilePage() {
         }
     });
 
-    // Carga inicial dos dados
+    // Carga inicial dos dados - agora chamando as duas funções
     loadProfileData();
+    loadFollowLists(); // <-- CHAMADA PARA A NOVA FUNÇÃO
 }

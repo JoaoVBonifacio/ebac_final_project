@@ -300,8 +300,9 @@ body {
 
 .post-footer {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* <-- ADICIONE ESTA LINHA */
   color: var(--color-muted);
+  font-size: 14px;
 }
 
 .post-footer .action {
@@ -394,4 +395,221 @@ body {
   border-radius: 9999px;
   font-weight: bold;
   cursor: pointer;
+}
+
+.modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.5); z-index: 100;
+  display: flex; justify-content: center; align-items: center;
+  transition: opacity 0.3s;
+}
+.modal-overlay.hidden { display: none; }
+.modal-content {
+  width: 90%; max-width: 600px; padding: 20px;
+  max-height: 80vh; overflow-y: auto; position: relative;
+}
+.close-modal-btn {
+  position: absolute; top: 10px; right: 15px; background: none;
+  border: none; color: var(--text-color); font-size: 2rem; cursor: pointer;
+}
+.comment-form-container { padding: 15px 0; border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border); }
+#comment-form { display: flex; flex-direction: column; gap: 10px; }
+#comment-form textarea { width: 100%; min-height: 60px; background: var(--dark-container); border: 1px solid var(--glass-border); border-radius: 8px; color: var(--text-color); padding: 10px; font-family: inherit; }
+#comment-form button { align-self: flex-end; /* ... re-use .btn styles */ }
+
+
+/* ================================== */
+/* Modal de Comentários               */
+/* ================================== */
+
+.modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.7); /* Fundo mais escuro */
+  z-index: 1000; /* Garante que fique acima de tudo */
+  display: flex; justify-content: center; align-items: center;
+  opacity: 0; /* Começa invisível */
+  visibility: hidden; /* Escondido para leitores de tela */
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+.modal-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+.modal-overlay:not(.hidden) {
+  opacity: 1;
+  visibility: visible;
+}
+
+
+.modal-content {
+  width: 90%; max-width: 600px;
+  background-color: var(--dark-container); /* Fundo principal do modal */
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(8px); /* Efeito glassmorphism */
+  -webkit-backdrop-filter: blur(8px);
+  padding: 20px;
+  max-height: 90vh; /* Ajuste para caber melhor na tela */
+  overflow-y: auto;
+  position: relative;
+  transform: translateY(-20px); /* Começa um pouco acima */
+  transition: transform 0.3s ease-in-out;
+}
+
+.modal-overlay:not(.hidden) .modal-content {
+  transform: translateY(0); /* Desliza para a posição final */
+}
+
+.close-modal-btn {
+  position: absolute; top: 15px; right: 20px;
+  background: none; border: none;
+  color: var(--color-muted); /* Cor mais discreta */
+  font-size: 2.5rem; /* Ícone maior */
+  cursor: pointer;
+  padding: 0; /* Remove padding padrão */
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+.close-modal-btn:hover {
+  color: var(--color-primary); /* Cor ao passar o mouse */
+}
+
+/* Estilo do post original dentro do modal */
+.modal-original-post {
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    background-color: transparent; /* Remove o fundo duplicado */
+    box-shadow: none; /* Remove sombra duplicada */
+    backdrop-filter: none; /* Remove blur duplicado */
+}
+
+/* Formulário de Comentários */
+.comment-form-container {
+  padding: 15px 0;
+  border-top: 1px solid var(--glass-border);
+  border-bottom: 1px solid var(--glass-border);
+  margin-bottom: 15px;
+}
+
+#comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#comment-form textarea {
+  width: 100%;
+  min-height: 80px; /* Um pouco maior */
+  background: var(--dark-container-light); /* Fundo mais claro para input */
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: var(--text-color);
+  padding: 12px;
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical; /* Permite redimensionar verticalmente */
+  box-sizing: border-box; /* Inclui padding na largura/altura */
+}
+#comment-form textarea::placeholder {
+  color: var(--color-muted);
+}
+#comment-form textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+#comment-form button {
+  align-self: flex-end;
+  /* Reutiliza o estilo do botão principal */
+  background-color: var(--color-primary);
+  color: var(--text-color-dark);
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+#comment-form button:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* Lista de Comentários */
+#modal-comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Espaçamento entre os comentários */
+}
+
+.comment-item {
+    background-color: var(--dark-container); /* Fundo leve para cada comentário */
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 15px;
+}
+
+.comment-item .post-header strong {
+    color: var(--text-color);
+}
+.comment-item .post-header span {
+    color: var(--color-muted);
+}
+.comment-item .post-content {
+    color: var(--text-color);
+    font-size: 0.95rem;
+}
+
+.no-comments-message {
+    text-align: center;
+    color: var(--color-muted);
+    padding: 20px;
+}
+
+/* Responsividade para o Modal */
+@media (max-width: 600px) {
+  .modal-content {
+    width: 95%;
+    padding: 15px;
+  }
+  .close-modal-btn {
+    font-size: 2rem;
+    top: 10px;
+    right: 15px;
+  }
+}
+
+/* ================================== */
+/* RESPONSIVIDADE                     */
+/* ================================== */
+
+/* Para telas de até 1100px (tablets em paisagem) */
+@media (max-width: 1100px) {
+  .feed-layout {
+    /* Esconde a coluna da direita e ajusta o layout para 2 colunas */
+    grid-template-columns: 275px minmax(0, 600px);
+    max-width: 900px;
+  }
+  .right-sidebar {
+    display: none;
+  }
+}
+
+/* Para telas de até 768px (tablets em retrato e celulares grandes) */
+@media (max-width: 768px) {
+  .feed-layout {
+    /* Deixa apenas a coluna principal (o feed) visível */
+    grid-template-columns: 1fr;
+    width: 100%;
+    padding: 0 10px;
+    gap: 15px;
+  }
+  .left-sidebar {
+    display: none;
+  }
+  .main-content {
+    padding-top: 10px;
+  }
 }

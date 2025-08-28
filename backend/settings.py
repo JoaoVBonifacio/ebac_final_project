@@ -8,7 +8,11 @@ SECRET_KEY = "django-insecure-g6t0qk=u3k*dfm9%iuncj(zx7#dt89y@=vl58txu72fy!$j1&3
 DEBUG = False
 
 # Deixe o ALLOWED_HOSTS aberto por enquanto para o deploy
-ALLOWED_HOSTS = ["joaovbonifacio.pythonanywhere.com"]
+ALLOWED_HOSTS = [
+    "joaovbonifacio.pythonanywhere.com",
+    "127.0.0.1",
+    "localhost",
+]
 
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5500",

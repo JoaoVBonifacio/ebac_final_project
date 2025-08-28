@@ -103,6 +103,20 @@
         </aside>
     </div>
 
+    <div id="comment-modal-overlay" class="modal-overlay hidden">
+        <div id="comment-modal-content" class="modal-content glass-container">
+            <button id="close-comment-modal" class="close-modal-btn">&times;</button>
+            <div id="modal-post-container"></div>
+            <div class="comment-form-container">
+                <form id="comment-form">
+                    <textarea id="comment-text" placeholder="Poste sua resposta" required></textarea>
+                    <button type="submit">Responder</button>
+                </form>
+            </div>
+            <div id="modal-comments-list"></div>
+        </div>
+    </div>
+
     <script src="static/app.js"></script>
 </body>
 </html>

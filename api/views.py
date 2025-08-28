@@ -2,8 +2,8 @@
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import User, Post, Follow
-from .serializers import UserRegisterSerializer, ProfileSerializer, PostSerializer, ChangePasswordSerializer
+from .models import User, Post, Follow, Comment
+from .serializers import UserRegisterSerializer, ProfileSerializer, PostSerializer, ChangePasswordSerializer, CommentSerializer
 
 # View para registrar um novo usuário
 class RegisterView(generics.CreateAPIView):
@@ -34,13 +34,24 @@ class CreatePostView(generics.CreateAPIView):
 # View para ver o feed (posts de quem o usuário segue)
 class FeedView(generics.ListAPIView):
     serializer_class = PostSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Pega a lista de IDs de usuários que eu sigo
-        followed_users_ids = self.request.user.following.values_list('followed_id', flat=True)
-        # Filtra os posts para mostrar apenas os desses usuários
-        return Post.objects.filter(author_id__in=followed_users_ids).order_by('-created_at')
+        user = self.request.user
+        
+        # Novo: verifica se um post_id específico foi solicitado
+        post_id = self.request.query_params.get('post_id')
+        if post_id:
+            try:
+                return Post.objects.filter(id=post_id)
+            except ValueError:
+                return Post.objects.none() # Retorna vazio se o ID for inválido
+
+        # Lógica existente para o feed normal
+        following_users_ids = user.following.values_list('followed_id', flat=True)
+        # Inclui os posts do próprio usuário também no feed principal
+        all_relevant_users_ids = list(following_users_ids) + [user.id]
+        return Post.objects.filter(author__id__in=all_relevant_users_ids).order_by('-created_at')
     
 class ChangePasswordView(generics.UpdateAPIView):
     serializer_class = ChangePasswordSerializer
@@ -100,4 +111,64 @@ class UserListView(generics.ListAPIView):
 
     def get_queryset(self):
         # Exclui o usuário logado da lista para ele não se seguir
-        return User.objects.exclude(pk=self.request.user.pk)    
+        return User.objects.exclude(pk=self.request.user.pk)   
+    
+
+class FollowingListView(generics.ListAPIView):
+    serializer_class = ProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Retorna a lista de usuários que o usuário logado SEGUE
+        followed_users_ids = self.request.user.following.values_list('followed_id', flat=True)
+        return User.objects.filter(id__in=followed_users_ids)
+
+class FollowersListView(generics.ListAPIView):
+    serializer_class = ProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Retorna a lista de usuários que SEGUEM o usuário logado
+        follower_ids = self.request.user.followers.values_list('follower_id', flat=True)
+        return User.objects.filter(id__in=follower_ids) 
+    
+class LikePostView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        try:
+            post = Post.objects.get(pk=pk)
+        except Post.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        user = request.user
+        
+        # Lógica de "toggle": se já curtiu, descurte. Se não, curte.
+        if user in post.likes.all():
+            post.likes.remove(user)
+            liked = False
+        else:
+            post.likes.add(user)
+            liked = True
+        
+        # Retorna o novo total de curtidas e o status da curtida do usuário
+        return Response({
+            'liked': liked,
+            'likes_count': post.likes.count()
+        }, status=status.HTTP_200_OK)
+        
+class PostCommentView(generics.ListCreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Filtra os comentários para retornar apenas os do post especificado na URL
+        post_id = self.kwargs.get('pk')
+        return Comment.objects.filter(post_id=post_id).order_by('created_at')
+
+    def perform_create(self, serializer):
+        # Associa o novo comentário ao post e ao usuário logado
+        post_id = self.kwargs.get('pk')
+        post = Post.objects.get(pk=post_id)
+        serializer.save(author=self.request.user, post=post)

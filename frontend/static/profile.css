@@ -808,3 +808,59 @@ body.profile-page {
     margin-left: auto; /* Alinha o botão à direita */
     font-size: 17px;
 }
+
+/* Adicione este código no final de profile.css */
+
+.follow-stats-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.follow-list-container h3 {
+    color: var(--color-primary);
+    margin-bottom: 15px;
+    font-size: 20px;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 10px;
+}
+
+.follow-list-container ul {
+    list-style: none;
+    padding: 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.follow-list-container li {
+    padding: 8px 0;
+    color: var(--color-muted);
+    font-size: 16px;
+}
+
+/* ================================== */
+/* RESPONSIVIDADE (PERFIL)            */
+/* ================================== */
+
+@media (max-width: 768px) {
+  body.profile-page {
+    align-items: flex-start;
+    padding: 10px;
+  }
+  .profile-container {
+    padding: 20px 15px;
+  }
+  .profile-container h2 {
+    font-size: 24px;
+    margin-bottom: 25px;
+  }
+  .profile-form-section h3 {
+    font-size: 20px;
+  }
+  .back-to-feed-link {
+    position: static;
+    margin-bottom: 20px;
+    justify-content: center;
+  }
+}
