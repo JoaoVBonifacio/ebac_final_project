@@ -50,10 +50,9 @@ Siga os passos abaixo para rodar o projeto na sua máquina.
 
 1.  **Clone o repositório:**
     ```bash
-    git clone [https://github.com/SEU-USUARIO/SEU-REPOSITORIO.git](https://github.com/SEU-USUARIO/SEU-REPOSITORIO.git)
-    cd nome-da-pasta-do-projeto
+    git clone [https://github.com/JoaoVBonifacio/ebac_final_project.git](https://github.com/JoaoVBonifacio/ebac_final_project.git)
+    cd ebac_final_project
     ```
-    *(Substitua com a URL do seu repositório)*
 
 2.  **Crie e ative o ambiente virtual:**
     ```bash
