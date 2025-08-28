@@ -2,6 +2,12 @@
 const API_URL = 'https://JoaoVBonifacio.pythonanywhere.com/api';
 const BASE_URL = 'https://JoaoVBonifacio.pythonanywhere.com';
 
+// Verifica se estamos em ambiente de desenvolvimento local (rodando com o Live Server)
+if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
+  API_URL = 'http://127.0.0.1:8000/api';
+  BASE_URL = 'http://127.0.0.1:8000';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- LÓGICA DA PÁGINA DE LOGIN E REGISTRO ---
