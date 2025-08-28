@@ -77,7 +77,6 @@ body {
 .left-sidebar {
   position: sticky;
   top: 20px;
-  height: calc(100vh - 40px);
   padding: 20px;
 }
 
@@ -320,7 +319,6 @@ body {
 .right-sidebar {
   position: sticky;
   top: 20px;
-  height: calc(100vh - 40px);
   display: flex;
   flex-direction: column;
   gap: 20px;
