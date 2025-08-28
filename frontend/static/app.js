@@ -1,6 +1,6 @@
 // frontend/static/app.js
-const API_URL = 'https://JoaoVBonifacio.pythonanywhere.com/api';
-const BASE_URL = 'https://JoaoVBonifacio.pythonanywhere.com';
+let API_URL = 'https://JoaoVBonifacio.pythonanywhere.com/api';
+let BASE_URL = 'https://JoaoVBonifacio.pythonanywhere.com';
 
 // Verifica se estamos em ambiente de desenvolvimento local (rodando com o Live Server)
 if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
