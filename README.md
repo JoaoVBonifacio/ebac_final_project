@@ -86,7 +86,7 @@ Siga os passos abaixo para rodar o projeto na sua máquina.
 6.  **Inicie o servidor do Frontend:**
     * Recomenda-se usar a extensão **"Live Server"** do Visual Studio Code.
     * Clique com o botão direito no arquivo `frontend/index.html` e selecione "Open with Live Server".
-    * O frontend estará acessível em `http://127.0.0.İ:5500`.
+    * O frontend estará acessível em `http://127.0.0.1:5500`.
 6.  Rodar o comando `python manage.py migrate` no console do PythonAnywhere para criar as tabelas no banco de dados de produção.
 
 ---
