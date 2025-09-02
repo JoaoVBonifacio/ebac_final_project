@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  # Serviço do Banco de Dados PostgreSQL
+  db:
+    image: postgres:14
+    container_name: swiftpost_db
+    environment:
+      - POSTGRES_DB=swiftpost_db
+      - POSTGRES_USER=swiftpost_user
+      - POSTGRES_PASSWORD=swiftpost_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+
+  # Serviço do Backend Django
+  backend:
+    image: joaovbonifacio/swiftpost-backend:latest
+    build: .
+    container_name: swiftpost_backend
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgres://swiftpost_user:swiftpost_password@db:5432/swiftpost_db
+      - DJANGO_SECRET_KEY=umachavemuitoseguraaqui # Troque por uma chave segura
+      - DEBUG=1
+
+  # Serviço do Frontend (Nginx)
+  frontend:
+    image: joaovbonifacio/swiftpost-frontend:latest
+    build:
+      context: ./frontend
+    container_name: swiftpost_frontend
+    ports:
+      - "5500:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
